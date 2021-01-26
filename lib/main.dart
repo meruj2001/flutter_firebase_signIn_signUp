@@ -19,30 +19,30 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: FutureBuilder(
-        future: Firebase.initializeApp(),
-        builder: (context, snapshot) {
-          // Check for errors
-          if (snapshot.hasError) {
-            print('error');
-            return Home();
-          }
+    return FutureBuilder(
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) {
+        // Check for errors
+        if (snapshot.hasError) {
+          print('error');
+          return Home();
+        }
 
-          // Once complete, show your application
-          if (snapshot.connectionState == ConnectionState.done) {
-            print('wrapper');
-            return StreamProvider<UserModel>.value(
-              value: AuthService().user,
-              child: Wrapper(),
-            );
-          }
+        // Once complete, show your application
+        if (snapshot.connectionState == ConnectionState.done) {
+          print('wrapper');
+          return StreamProvider<UserModel>.value(
+            value: AuthService().user,
+            child: MaterialApp(
+              home: Wrapper(),
+            ),
+          );
+        }
 
-          print('loading');
-          // Otherwise, show something whilst waiting for initialization to complete
-          return Loading();
-        },
-      ),
+        print('loading');
+        // Otherwise, show something whilst waiting for initialization to complete
+        return Loading();
+      },
     );
   }
 }
