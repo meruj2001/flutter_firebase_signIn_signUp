@@ -28,7 +28,7 @@ class Database {
     return snapshot.docs.map((doc) {
       return BrewModel(
         name: doc.data()['name'] ?? '',
-        strength: doc.data()['strength'] ?? '',
+        strength: doc.data()['strength'] ?? 100,
         sugars: doc.data()['sugars'] ?? '0',
       );
     }).toList();

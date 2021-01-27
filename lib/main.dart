@@ -41,7 +41,9 @@ class _MyAppState extends State<MyApp> {
 
         print('loading');
         // Otherwise, show something whilst waiting for initialization to complete
-        return Loading();
+        return MaterialApp(
+          home: Loading(),
+        );
       },
     );
   }

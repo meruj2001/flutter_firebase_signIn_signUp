@@ -16,6 +16,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final AuthService _authService = AuthService();
 
   final _formKey = GlobalKey<FormState>();
+  final List<String> sugars = ['0', '1', '2', '3', '4', '5'];
+
+  String _currentName;
+  String _currentSugars;
+  int _currentStrength;
 
   bool loading = false;
 
@@ -29,7 +34,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.brown[100],
+            backgroundColor: Colors.brown[50],
             appBar: AppBar(
               backgroundColor: Colors.brown[500],
               title: Text('Sign In'),
@@ -50,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 40.0,
+                      height: 10.0,
                     ),
                     TextFormField(
                       decoration: textInputDecoration(hintText: 'Email'),
@@ -60,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 10.0,
                     ),
                     TextFormField(
                       decoration: textInputDecoration(hintText: 'Password'),
@@ -73,7 +78,39 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                     ),
                     SizedBox(
-                      height: 30,
+                      height: 10.0,
+                    ),
+                    TextFormField(
+                      decoration: textInputDecoration(hintText: 'Name'),
+                      validator: (val) =>
+                          val.isEmpty ? 'Please enter a name' : null,
+                      onChanged: (val) => setState(
+                        () => _currentName = val,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    DropdownButtonFormField(
+                      decoration: textInputDecoration(),
+                      value: _currentSugars ?? sugars[2],
+                      items: sugars.map((sugar) {
+                        return DropdownMenuItem(
+                          value: sugar,
+                          child: Text('$sugar sugars'),
+                        );
+                      }).toList(),
+                      onChanged: (val) => setState(() => _currentSugars = val),
+                    ),
+                    Slider(
+                      activeColor: Colors.brown[_currentStrength ?? 100],
+                      inactiveColor: Colors.brown[_currentStrength ?? 100],
+                      value: (_currentStrength ?? 100).toDouble(),
+                      min: 100.0,
+                      max: 900.0,
+                      divisions: 8,
+                      onChanged: (val) =>
+                          setState(() => _currentStrength = val.round()),
                     ),
                     RaisedButton(
                       color: Colors.brown[600],
@@ -87,7 +124,13 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (_formKey.currentState.validate()) {
                           setState(() => loading = true);
                           dynamic result = await _authService
-                              .signUpWithEmailAndPassword(email, password);
+                              .signUpWithEmailAndPassword(
+                                email: email,
+                                password: password,
+                                name: _currentName,
+                                sugar: _currentSugars,
+                                strength: _currentStrength,
+                              );
                           if (result == null) {
                             setState(() => loading = false);
                             setState(
@@ -97,7 +140,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 10.0,
                     ),
                     Center(
                       child: Text(
