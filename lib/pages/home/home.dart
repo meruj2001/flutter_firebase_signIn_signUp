@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_signup/models/brew_model.dart';
 import 'package:flutter_signin_signup/pages/home/brew_list.dart';
 import 'package:flutter_signin_signup/pages/home/settings_form.dart';
+import 'package:flutter_signin_signup/pages/loading.dart';
 import 'package:flutter_signin_signup/services/auth.dart';
 import 'package:flutter_signin_signup/services/database.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,19 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   AuthService _auth = AuthService();
+
+  bool loading = true;
+
+  Future sleep1() {
+    return new Future.delayed(
+        const Duration(seconds: 1), () => setState(() => loading = false));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    sleep1();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,40 +44,42 @@ class _HomeState extends State<Home> {
 
     return StreamProvider<List<BrewModel>>.value(
       value: Database().brews,
-      child: Scaffold(
-        backgroundColor: Colors.brown[100],
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Text('Home page'),
-          actions: [
-            FlatButton.icon(
-              icon: Icon(
-                Icons.person,
-                color: Colors.brown[200],
+      child: loading
+          ? Loading()
+          : Scaffold(
+              backgroundColor: Colors.brown[100],
+              appBar: AppBar(
+                backgroundColor: Colors.black,
+                title: Text('Home page'),
+                actions: [
+                  FlatButton.icon(
+                    icon: Icon(
+                      Icons.person,
+                      color: Colors.brown[200],
+                    ),
+                    label: Text(
+                      'logout',
+                      style: TextStyle(color: Colors.brown[200]),
+                    ),
+                    onPressed: () async {
+                      await _auth.signOut();
+                    },
+                  ),
+                  FlatButton.icon(
+                    icon: Icon(
+                      Icons.settings,
+                      color: Colors.brown[200],
+                    ),
+                    label: Text(
+                      'Settings',
+                      style: TextStyle(color: Colors.brown[200]),
+                    ),
+                    onPressed: () => _showSettings(),
+                  ),
+                ],
               ),
-              label: Text(
-                'logout',
-                style: TextStyle(color: Colors.brown[200]),
-              ),
-              onPressed: () async {
-                await _auth.signOut();
-              },
+              body: BrewList(),
             ),
-            FlatButton.icon(
-              icon: Icon(
-                Icons.settings,
-                color: Colors.brown[200],
-              ),
-              label: Text(
-                'Settings',
-                style: TextStyle(color: Colors.brown[200]),
-              ),
-              onPressed: () => _showSettings(),
-            ),
-          ],
-        ),
-        body: BrewList(),
-      ),
     );
   }
 }
